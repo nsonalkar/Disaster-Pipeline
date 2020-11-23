@@ -1,6 +1,26 @@
 # Disaster Response Pipeline Project
 
-### Instructions:
+## Installation
+### Packages
+* Plotly
+* Pandas
+* Numpy
+* Sklearn
+* Nltk
+* sqlalchemy
+
+
+
+## Project Motivation
+During the midst of Covid, I wanted to work on a project that could help first responders act quicker to disasters
+
+
+## File Descriptions
+* Data processing code in data directory
+* Modeling code in model directory
+* Web app code in app directory
+
+## Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
     - To run ETL pipeline that cleans data and stores in database
