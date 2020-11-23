@@ -15,12 +15,19 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.cross_validation import train_test_split
+#from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.externals import joblib
-
+#from sklearn.externals import joblib
+import joblib
+from sklearn.metrics import f1_score, recall_score, precision_score
 def load_data(database_filepath):
+    '''
+    Loads Data from Database
+    Inputs: Database path name
+    Output: Feature data, label data, label names
+    '''
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql_table('Disaster',engine)
     X = df['message']
@@ -28,6 +35,11 @@ def load_data(database_filepath):
     return X,Y, list(Y.columns)
 
 def tokenize(text):
+    '''
+    Cleans Text
+    Inputs: Text
+    Output: Cleaned Text
+    '''
     text = text.lower()
     p = re.compile('[:,.!?]')
     text = re.sub(p,'',text)
@@ -41,11 +53,16 @@ def tokenize(text):
 
 
 def build_model():
+    '''
+    Builds Model Object
+    Inputs: None
+    Output: model object
+    '''
     pipeline = Pipeline([('vect', CountVectorizer(tokenizer=tokenize)),
                      ('tfidf',TfidfTransformer()),
                      ('clf', MultiOutputClassifier(RandomForestClassifier()))])
-    parameters = {'clf__estimator__max_features':['sqrt', 0.5],
-              'clf__estimator__n_estimators':[50, 100],
+    parameters = {
+              'clf__estimator__n_estimators':[5, 10],
               
              }
 
@@ -54,7 +71,12 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    y_pred = cv.predict(X_test)
+    '''
+    Prints Evaluation Metrics
+    Inputs: model object, test data, test labels, label names
+    Output: None
+    '''
+    y_pred = model.predict(X_test)
     for i in range(len(category_names)):
         print(f1_score(Y_test.iloc[:,i],y_pred[:,i],average=None))
         print(precision_score(Y_test.iloc[:,i],y_pred[:,i],average=None))
@@ -62,10 +84,16 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    Saves model to pickle object
+    Inputs: model object, filepath
+    Output: None
+    '''
     joblib.dump(model,model_filepath)
 
 
 def main():
+    
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))

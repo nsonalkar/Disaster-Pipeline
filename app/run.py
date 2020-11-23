@@ -7,14 +7,22 @@ from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
+import plotly
 from plotly.graph_objs import Bar
-from sklearn.externals import joblib
+#import plotly.express as px
+#from sklearn.externals import joblib
+import joblib
 from sqlalchemy import create_engine
 
 
 app = Flask(__name__)
 
 def tokenize(text):
+    '''
+    Cleans Text
+    Inputs: Text
+    Output: Cleaned Text
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -65,6 +73,26 @@ def index():
             }
         }
     ]
+    y = df.iloc[:, 4:].sum().sort_values()
+    names = list(y.index)
+    graphs.append({
+            'data': [
+                Bar(
+                    x=names,
+                    y=y
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Disaster Events',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        })
     
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]

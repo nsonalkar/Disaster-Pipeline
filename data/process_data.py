@@ -3,12 +3,22 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    Reads Data into Dataframe
+    Inputs: filepath 1, filepath 2
+    Output: Dataframe
+    '''
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = messages.merge(categories,on='id',how='inner')
     return df
 
 def clean_data(df):
+    '''
+    Cleans Data
+    Inputs: DataFrame
+    Output: Cleaned DataFrame
+    '''
     categories = df['categories'].str.split(';',expand=True)
     # select the first row of the categories dataframe
     row = categories.iloc[0]
@@ -30,6 +40,11 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+    '''
+    Saves Data to Database
+    Inputs: DataFrame, filename
+    Output: None
+    '''
     engine = create_engine('sqlite:///Disaster.db')
     df.to_sql('Disaster', engine, index=False,if_exists='replace')  
 
